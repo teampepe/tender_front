@@ -1,0 +1,39 @@
+.login-view {
+  display: flex;
+  justify-content: center;
+
+  .credentials {
+    padding: 2rem;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 400px;
+    background-color: #fff;
+    box-shadow: 0 0 0 1px #d8d8d8;
+
+    .error {
+      background: #ffcece;
+      padding: 1rem;
+      font-size: 1.2rem;
+      border-radius: 5px;
+      color: #c32c2c;
+      border: 1px solid #ff8989;
+    }
+
+    .controls {
+      margin: 2rem 0 0;
+
+      .btn {
+        margin: 0 0 1rem 0;
+      }
+    }
+
+    input {
+      padding: 1rem;
+      margin: 1rem 0 0;
+      background: #ecf1f9;
+      border: none;
+    }
+  }
+}
