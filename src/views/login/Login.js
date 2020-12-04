@@ -55,7 +55,7 @@ class Login extends React.PureComponent {
         const login = this.state.login;
         const password = this.state.password;
 
-        axios.post('http://35.228.6.45:5000/login',  { login, password }).then(response => {
+        axios.post('http://84.201.170.248:5000/login',  { login, password }).then(response => {
             if(response.status === 200){
                 const token = response.data.token;
                 cookie.save('token', token);

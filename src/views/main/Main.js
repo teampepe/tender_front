@@ -2,6 +2,7 @@ import React from 'react';
 import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import cookie from 'react-cookies'
+import Plot from 'react-plotly.js';
 
 import './Main.scss';
 import HeaderView from '../../components/header/HeaderView';
@@ -118,7 +119,7 @@ class Main extends React.PureComponent {
 
             this.setState({showCropper: false, showItems: true, loadingItems: true});
 
-            axios.post('http://35.228.6.45:5000', this.blobData, {
+            axios.post('http://84.201.170.248:5000', this.blobData, {
                 headers: {Authorization: "Bearer MTIzNA=="}
             }).then(response => {
                 console.log('response', response)
@@ -131,7 +132,7 @@ class Main extends React.PureComponent {
                 this.setState({loadingItems: false});
             });
         } catch(err){
-            alert(err); 
+            alert(err);
         }
     };
 
@@ -244,7 +245,7 @@ class Main extends React.PureComponent {
                     {this.state.items.map((item, index) => {
                         return (
                             <div key={index} className="item">
-                                <img src={item.img_url || 'http://35.228.6.45:5000/images/19592657.jpg'} className="photo" />
+                                <img src={item.img_url || 'http://84.201.170.248:5000/images/19592657.jpg'} className="photo" />
                                 <table>
                                     <tbody>
                                     <tr>
@@ -280,6 +281,8 @@ class Main extends React.PureComponent {
             );
         };
 
+        const avgArr = arr => arr.reduce((sum, item) => sum + item, 0) / arr.length;
+
         const renderTenders = () => {
             if(this.state.itemTypeSeleted !== 0) return null;
 
@@ -287,59 +290,83 @@ class Main extends React.PureComponent {
                 return <div className="items">Не найдено</div>;
             }
 
+            const names = this.state.tenders.filter(items => items.length).map(items => {
+               return items.length ? items[0].item_name : '-';
+            });
+
+            const avgPrices = this.state.tenders.filter(items => items.length).map(items => {
+                return avgArr(items.map(item => item.price_item))
+            });
+
             return (
-                <div className="items">
-                    {
-                        this.state.tenders.map((tenders, index1) => {
-                        return (
-                            <>
-                                {tenders.map((tender, index2) => {
-                                    return (
-                                        <div key={`${index1}-${index2}`} className="item">
-                                            <table>
-                                                <tbody>
-                                                <tr>
-                                                    <td>Наименование:</td>
-                                                    <td>{tender.item_name}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Стартовая цена:</td>
-                                                    <td>{tender.start_price}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>ИНН</td>
-                                                    <td>{tender.inn}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>КПП:</td>
-                                                    <td>{tender.kpp}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>СТЕ:</td>
-                                                    <td>{tender.ste_id}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Адрес:</td>
-                                                    <td>{tender.address}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Количество:</td>
-                                                    <td>{tender.qnt_items}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Цена:</td>
-                                                    <td>{tender.price_item}</td>
-                                                </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    );
-                                })}
-                            </>
-                            )
-                        })
-                    }
-                </div>
+                <>
+                    <Plot
+                      style={{width: '100%', margin: '20px 0', display: 'flex', justifyContent: 'center', alignItems: 'center'}}
+                      data={[
+                          {
+                              x: names,
+                              y: avgPrices,
+                              type: 'scatter',
+                              mode: 'lines+markers',
+                              marker: {color: 'red'},
+                          },
+                          {type: 'bar', x: names, y: avgPrices},
+                      ]}
+                      layout={{width: 900, height: 350, title: 'Средняя цена'}}
+                    />
+                    <div className="items">
+                        {
+                            this.state.tenders.map((tenders, index1) => {
+                            return (
+                                <>
+                                    {tenders.map((tender, index2) => {
+                                        return (
+                                            <div key={`${index1}-${index2}`} className="item">
+                                                <table>
+                                                    <tbody>
+                                                    <tr>
+                                                        <td>Наименование:</td>
+                                                        <td>{tender.item_name}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Стартовая цена:</td>
+                                                        <td>{tender.start_price}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>ИНН</td>
+                                                        <td>{tender.inn}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>КПП:</td>
+                                                        <td>{tender.kpp}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>СТЕ:</td>
+                                                        <td>{tender.ste_id}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Адрес:</td>
+                                                        <td>{tender.address}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Количество:</td>
+                                                        <td>{tender.qnt_items}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Цена:</td>
+                                                        <td>{tender.price_item}</td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        );
+                                    })}
+                                </>
+                                )
+                            })
+                        }
+                    </div>
+                </>
             );
         };
 
